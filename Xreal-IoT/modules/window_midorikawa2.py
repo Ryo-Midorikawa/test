@@ -27,7 +27,10 @@ class WindowCanvasManager:
             self.window_center[0] + self.circle_radius,
             self.window_center[1] + self.circle_radius,
         )
-
+        
+        # degree instance
+        self.input_degree = 0
+        
         # キャンバスの作成
         self.canvas = tk.Canvas(
             self.root,
@@ -69,6 +72,9 @@ class WindowCanvasManager:
     def draw_voice_angle_arc_and_text_forever(
         self, voice_angle_queue: Queue, transcribed_text_queue: Queue
     ):
+        print(self.drown_arc_id)
+        print(self.drown_text_id)
+        
         # TODO Queueから何回かNoneを取得したら円弧とテキストを削除する
         # Queueから角度を取得(ノンブロッキング)
         input_degree: int = (
@@ -77,21 +83,7 @@ class WindowCanvasManager:
             else None
         )
 
-        # 緑川
-        # input_degreeに関してしきい値（360度の範囲で）を適当に設定して右，正面，左の3方向を分割
-        # 4パターンのinput_degreeに対してそれぞれxy座標を設定
-        if (input_degree >= 0 and input_degree <= 45) or (input_degree > 315 and input_degree <= 360):
-            x = self.window_center[0] + self.circle_radius
-            y = self.window_center[1]
-        if input_degree > 45 and input_degree <= 135:
-            x = self.window_center[0]
-            y = self.window_center[1] - self.circle_radius - 100
-        if input_degree > 135 and input_degree <= 225:
-            x = self.window_center[0] - self.circle_radius
-            y = self.window_center[1]
-        else:
-            x = self.window_center[0]
-            y = self.window_center[1] + self.circle_radius + 100
+        
 
 
         # Queueからテキストを取得(ノンブロッキング)
@@ -112,24 +104,28 @@ class WindowCanvasManager:
             )
             return
 
-        # if input_degree is not None:
-        #     # 円弧が描画されていない場合は描画する
-        #     if self.drown_arc_id is None:
-        #         self.create_arc(
-        #             self.upper_left[0],
-        #             self.upper_left[1],
-        #             self.lower_right[0],
-        #             self.lower_right[1],
-        #             start=0,
-        #             extent=10,
-        #             style=tk.ARC,
-        #             outline="red",
-        #             width=10,
-        #         )
-        #     # 円弧の角度を更新
-        #     else:
-        #         self.update_arc_angle(self.drown_arc_id, input_degree - 5)
-
+        if input_degree is not None:
+            # 緑川
+            # input_degreeに関してしきい値（360度の範囲で）を適当に設定して右，正面，左の3方向を分割
+            # 4パターンのinput_degreeに対してそれぞれxy座標を設定
+            self.input_degree = input_degree
+        
+                
+            
+        
+        if (self.input_degree >= 0 and self.input_degree <= 45) or (self.input_degree > 315 and self.input_degree <= 360):
+            x = self.window_center[0] + self.circle_radius
+            y = self.window_center[1]
+        elif self.input_degree > 45 and self.input_degree <= 135:
+            x = self.window_center[0]
+            y = self.window_center[1] - self.circle_radius - 100
+        elif self.input_degree > 135 and self.input_degree <= 225:
+            x = self.window_center[0] - self.circle_radius
+            y = self.window_center[1]
+        else:
+            x = self.window_center[0]
+            y = self.window_center[1] + self.circle_radius + 100
+            
         if input_text is not None:
             # テキストが描画されていない場合は描画する
             if self.drown_text_id is None:
